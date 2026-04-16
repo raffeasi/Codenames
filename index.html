@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,88 +16,118 @@
             padding: 20px;
         }
 
-        .nav-link {
-            margin-bottom: 20px;
-            text-decoration: none;
-            color: #2196F3;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-
         /* The Grid Container */
         .container {
             display: grid;
-            /* 5 columns that scale perfectly on mobile */
             grid-template-columns: repeat(5, 1fr); 
             gap: 8px;
             width: 100%;
             max-width: 600px;
         }
 
-        /* The Individual Box wrappers */
         .item {
-            aspect-ratio: 3 / 2; /* Keeps them as rectangles matching the randomizer */
+            aspect-ratio: 3 / 2;
             outline: 2px solid black;
             background: white;
             border-radius: 4px;
             display: flex;
             justify-content: center;
             align-items: center;
+            cursor: pointer;
+            position: relative;
         }
 
-        /* The actual Input fields */
         .item input {
             width: 90%;
             height: 80%;
             border: none;
-            outline: none; /* Removes the blue box when clicking */
+            outline: none;
             text-align: center;
-            font-size: clamp(10px, 3vw, 16px); /* Text shrinks on smaller screens */
-            text-transform: uppercase; /* Makes it look like the actual game */
+            font-size: clamp(10px, 3vw, 16px);
+            text-transform: uppercase;
             font-weight: bold;
+            background: transparent;
         }
 
-        h1 {
-            margin-bottom: 10px;
+        /* The Secret Menu (Hidden by default) */
+        .color-menu {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 2px solid #333;
+            z-index: 10;
+            padding: 5px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
+
+        /* Show menu when the box has the 'active' class */
+        .item.active .color-menu {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            border: 1px solid #000;
+            cursor: pointer;
+        }
+
+        .btn-red { background: #f44336; }
+        .btn-blue { background: #2196F3; }
+        .btn-yellow { background: #FFEB3B; }
+        .btn-black { background: #222; }
+        .btn-reset { background: #fff; line-height: 25px; text-align: center; font-size: 12px; }
+
     </style>
 </head>
 <body>
 
     <h1>Codenames Board</h1>
-    <a href="randomizer.html" class="nav-link">Go to Color Randomizer →</a>
+    <a href="./randomizer.html" style="text-align: center;">Go to Color Randomizer</a>
+    <p>Click a box to set its color.</p>
     
-    <div class="container">
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        <div class="item"><input type="text" placeholder="WORD"></div>
-        <div class="item"><input type="text" placeholder="WORD"></div>
-    </div>
+    <div class="container" id="board">
+        </div>
 
+    <script>
+        const board = document.getElementById('board');
+
+// 1. Function to save all current words to LocalStorage
+function saveWords() {
+    const inputs = document.querySelectorAll('.item input');
+    const wordsArray = Array.from(inputs).map(input => input.value);
+    localStorage.setItem('codenames_words', JSON.stringify(wordsArray));
+}
+
+// 2. Load words from memory
+const savedWords = JSON.parse(localStorage.getItem('codenames_words')) || Array(25).fill('');
+
+for (let i = 0; i < 25; i++) {
+    const item = document.createElement('div');
+    item.className = 'item';
+    
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = 'WORD';
+    input.value = savedWords[i]; // Put the saved word back in the box
+
+    // SAVE every time someone stops typing
+    input.oninput = () => saveWords(); 
+    
+    input.onclick = (e) => e.stopPropagation();
+
+    // ... (Keep the rest of your color menu code here) ...
+    // Make sure to add the color menu logic back inside this loop!
+    
+    item.appendChild(input);
+    board.appendChild(item);
+}
+    </script>
 </body>
 </html>
