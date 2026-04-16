@@ -370,11 +370,19 @@ const dictionary = [
     const shuffled = dictionary.sort(() => 0.5 - Math.random());
 
     // 4. Fill each box with a unique word from the shuffled list
-    inputs.forEach((input, index) => {
-        if (shuffled[index]) {
-            input.value = shuffled[index];
+inputs.forEach((input, index) => {
+    if (shuffled[index]) {
+        const word = shuffled[index];
+        input.value = word;
+
+        // If the word is long, make the font smaller
+        if (word.length > 9) {
+            input.style.fontSize = "12px";
+        } else {
+            input.style.fontSize = "18px";
         }
-    });
+    }
+});
 
     // 5. CRITICAL: Save these new words to LocalStorage immediately
     saveWords();
