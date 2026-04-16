@@ -16,3 +16,9 @@ body {
 .container div {
     outline: solid black
 }
+
+.randomizer {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
