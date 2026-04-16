@@ -50,19 +50,20 @@
         }
 
         /* The Secret Menu (Hidden by default) */
-        .color-menu {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            border: 2px solid #333;
-            z-index: 10;
-            padding: 5px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
+.color-menu {
+    display: none;
+    position: fixed; /* Changed from absolute to fixed */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border: 3px solid #333;
+    z-index: 9999; /* Higher number to stay on top of everything */
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    gap: 10px;
+}
 
         /* Show menu when the box has the 'active' class */
         .item.active .color-menu {
@@ -74,13 +75,13 @@
             margin: 5px;
         }
 
-        .btn {
-            width: 30px;
-            height: 30px;
-            border-radius: 4px;
-            border: 1px solid #000;
-            cursor: pointer;
-        }
+/* Ensure the buttons are big enough for thumbs */
+.btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    cursor: pointer;
+}
 
         .btn-red { background: #f44336; }
         .btn-blue { background: #2196F3; }
