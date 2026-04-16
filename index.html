@@ -104,6 +104,31 @@
 .clear-btn:hover {
     background-color: #cc0000;
 }
+/* This ONLY affects buttons inside the color menu */
+.color-menu .btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    border: 2px solid #333;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Specific colors inside the menu */
+.color-menu .btn-red { background-color: #f44336 !important; }
+.color-menu .btn-blue { background-color: #2196F3 !important; }
+.color-menu .btn-yellow { background-color: #FFEB3B !important; }
+.color-menu .btn-black { background-color: #222 !important; }
+
+/* The X Button specifically */
+.color-menu .btn-reset { 
+    background-color: #ffffff !important; 
+    font-size: 24px; /* Big X */
+    font-weight: bold;
+    color: #333;
+}
 
 a {
     color: #222;
