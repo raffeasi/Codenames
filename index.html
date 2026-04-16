@@ -104,12 +104,18 @@
     background-color: #cc0000;
 }
 
+p,a {
+    color: #222;
+    font-weight: 1000;
+    text-decoration: none;
+}
+
     </style>
 </head>
 <body>
 
     <h1>Codenames Board</h1>
-    <a href="./randomizer.html" style="text-align: center;">Go to Color Randomizer</a>
+    <a href="./randomizer.html" style="text-align: center;">Go to Color Randomizer →</a>
     <button onclick="clearBoard()" class="clear-btn">Clear All Words</button>
     <p>Click a box to set its color.</p>
     
@@ -153,11 +159,11 @@ for (let i = 0; i < 25; i++) {
 function clearBoard() {
     if (confirm("Are you sure you want to erase all words?")) {
         // 1. Find all the editable word boxes
-        const displays = document.querySelectorAll('.item div[contenteditable]');
+        const displays = document.querySelectorAll('.item input');
         
         // 2. Loop through them and make them empty
-        displays.forEach(div => {
-            div.innerText = "";
+        displays.forEach(input => {
+            input.value = "";
         });
 
         // 3. Update the memory so they stay empty on refresh
