@@ -1,38 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Randomizer</title>
+    <title>Codenames Randomizer</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .nav-link {
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+
+        /* The Grid Container */
+        .container {
+            display: grid;
+            /* 5 equal columns that shrink to fit mobile */
+            grid-template-columns: repeat(5, 1fr); 
+            gap: 8px;
+            width: 100%;
+            max-width: 600px; /* Limits size on desktop */
+        }
+
+        /* The Individual Cards */
+        .card {
+            aspect-ratio: 3 / 2; /* Keeps them as nice rectangles */
+            outline: 2px solid black;
+            border-radius: 4px;
+            transition: transform 0.1s;
+        }
+
+        /* Colors */
+        .blue { background-color: #2196F3; }
+        .red { background-color: #f44336; }
+        .yellow { background-color: #FFEB3B; }
+        .black { background-color: #222; }
+
+        button {
+            margin-top: 30px;
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+    </style>
 </head>
 <body>
-        <a href="./index.html" class="randomizer">Go back!</a>
-        <div class="container">
-<div></div>
-<div></div>
-<div></div>
-<div></div>
-<div></div>
-<div></div>
-<div></div>
-<div></div>
-<div></div>
-<div></div>
-<div></div>
-<div></div>
-<div></div>
-<div></div>
-<div></div>
-<div></div>
-<div></div>
-<div></div>
-<div></div>
-<div></div>
-<div></div>
-<div></div>
-<div></div>
-<div></div>
-<div></div>
+
+    <a href="index.html" class="nav-link">← Back to Inputs</a>
+    
+    <div id="board" class="container"></div>
+
+    <button onclick="generateColors()">Shuffle New Board</button>
+
+    <script>
+        function generateColors() {
+            const board = document.getElementById('board');
+            board.innerHTML = ''; // Clear previous board
+
+            // Create the required counts: 9 Blue, 8 Red, 7 Yellow, 1 Black
+            let colors = [
+                ...Array(9).fill('blue'),
+                ...Array(8).fill('red'),
+                ...Array(7).fill('yellow'),
+                'black'
+            ];
+
+            // Shuffle Algorithm (Fisher-Yates)
+            for (let i = colors.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [colors[i], colors[j]] = [colors[j], colors[i]];
+            }
+
+            // Create and add the divs to the grid
+            colors.forEach(color => {
+                const div = document.createElement('div');
+                div.className = `card ${color}`;
+                board.appendChild(div);
+            });
+        }
+
+        // Run once when page loads
+        generateColors();
+    </script>
 </body>
 </html>

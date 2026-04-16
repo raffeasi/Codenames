@@ -1,38 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Codenames</title>
+    <title>Codenames - Input Board</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .nav-link {
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #2196F3;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* The Grid Container */
+        .container {
+            display: grid;
+            /* 5 columns that scale perfectly on mobile */
+            grid-template-columns: repeat(5, 1fr); 
+            gap: 8px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        /* The Individual Box wrappers */
+        .item {
+            aspect-ratio: 3 / 2; /* Keeps them as rectangles matching the randomizer */
+            outline: 2px solid black;
+            background: white;
+            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* The actual Input fields */
+        .item input {
+            width: 90%;
+            height: 80%;
+            border: none;
+            outline: none; /* Removes the blue box when clicking */
+            text-align: center;
+            font-size: clamp(10px, 3vw, 16px); /* Text shrinks on smaller screens */
+            text-transform: uppercase; /* Makes it look like the actual game */
+            font-weight: bold;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
-    <a href="randomizer.html" class="randomizer">Randomizer</a>
+
+    <h1>Codenames Board</h1>
+    <a href="randomizer.html" class="nav-link">Go to Color Randomizer →</a>
+    
     <div class="container">
-<div><input type="text"></div>
-<div><input type="text"></div>
-<div><input type="text"></div>
-<div><input type="text"></div>
-<div><input type="text"></div>
-<div><input type="text"></div>
-<div><input type="text"></div>
-<div><input type="text"></div>
-<div><input type="text"></div>
-<div><input type="text"></div>
-<div><input type="text"></div>
-<div><input type="text"></div>
-<div><input type="text"></div>
-<div><input type="text"></div>
-<div><input type="text"></div>
-<div><input type="text"></div>
-<div><input type="text"></div>
-<div><input type="text"></div>
-<div><input type="text"></div>
-<div><input type="text"></div>
-<div><input type="text"></div>
-<div><input type="text"></div>
-<div><input type="text"></div>
-<div><input type="text"></div>
-<div><input type="text"></div>
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        <div class="item"><input type="text" placeholder="WORD"></div>
+        <div class="item"><input type="text" placeholder="WORD"></div>
+    </div>
+
 </body>
 </html>
