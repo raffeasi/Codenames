@@ -154,6 +154,41 @@ for (let i = 0; i < 25; i++) {
     
     item.appendChild(input);
     board.appendChild(item);
+    // 1. Create the Menu Container
+    const menu = document.createElement('div');
+    menu.className = 'color-menu';
+
+    // 2. Define the buttons
+    const colors = [
+        { name: 'red', hex: '#f44336' },
+        { name: 'blue', hex: '#2196F3' },
+        { name: 'yellow', hex: '#FFEB3B' },
+        { name: 'black', hex: '#222' },
+        { name: 'reset', hex: '#fff' }
+    ];
+
+    // 3. Build the buttons
+    colors.forEach(c => {
+        const btn = document.createElement('div');
+        btn.className = `btn btn-${c.name}`;
+        if(c.name === 'reset') btn.innerText = 'X';
+        
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            item.style.backgroundColor = c.hex;
+            input.style.color = (c.name === 'black') ? 'white' : 'black';
+            item.classList.remove('active');
+        };
+        menu.appendChild(btn);
+    });
+
+    // 4. Logic to open the menu
+    item.onclick = () => {
+        document.querySelectorAll('.item').forEach(el => el.classList.remove('active'));
+        item.classList.add('active');
+    };
+
+    item.appendChild(menu);
 }
 
 function clearBoard() {
