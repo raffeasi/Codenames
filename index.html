@@ -70,6 +70,10 @@
             gap: 5px;
         }
 
+        p {
+            margin: 5px;
+        }
+
         .btn {
             width: 30px;
             height: 30px;
@@ -84,12 +88,29 @@
         .btn-black { background: #222; }
         .btn-reset { background: #fff; line-height: 25px; text-align: center; font-size: 12px; }
 
+.clear-btn {
+    margin: 10px;
+    background-color: #ff4d4d;
+    color: white;
+    font-weight: bold;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1rem;
+}
+
+.clear-btn:hover {
+    background-color: #cc0000;
+}
+
     </style>
 </head>
 <body>
 
     <h1>Codenames Board</h1>
     <a href="./randomizer.html" style="text-align: center;">Go to Color Randomizer</a>
+    <button onclick="clearBoard()" class="clear-btn">Clear All Words</button>
     <p>Click a box to set its color.</p>
     
     <div class="container" id="board">
@@ -127,6 +148,26 @@ for (let i = 0; i < 25; i++) {
     
     item.appendChild(input);
     board.appendChild(item);
+}
+
+function clearBoard() {
+    if (confirm("Are you sure you want to erase all words?")) {
+        // 1. Find all the editable word boxes
+        const displays = document.querySelectorAll('.item div[contenteditable]');
+        
+        // 2. Loop through them and make them empty
+        displays.forEach(div => {
+            div.innerText = "";
+        });
+
+        // 3. Update the memory so they stay empty on refresh
+        saveWords();
+        
+        // Optional: Reset all colors back to white too
+        document.querySelectorAll('.item').forEach(item => {
+            item.style.backgroundColor = "white";
+        });
+    }
 }
     </script>
 </body>
