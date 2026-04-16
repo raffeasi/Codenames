@@ -90,7 +90,7 @@
         .btn-reset { background: #fff; line-height: 25px; text-align: center; font-size: 12px; }
 
 .clear-btn {
-    margin: 20px;
+    margin: 5px;
     background-color: #ff4d4d;
     color: white;
     font-weight: bold;
@@ -136,6 +136,37 @@ a {
     text-decoration: none;
 }
 
+.fill-btn {
+    margin-top: 15px;
+    background-color: #4CAF50; /* Green color */
+    color: white;
+    font-weight: bold;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    margin-left: 10px; /* Space it away from the Clear button */
+}
+
+.fill-btn:hover {
+    background-color: #45a049;
+}
+
+.button-controls {
+    display: flex;         /* This is the magic line */
+    justify-content: center; /* Centers them horizontally */
+    gap: 15px;             /* Adds a nice 15px gap between the buttons */
+    margin-top: 30px;      /* Space below the grid */
+    margin-bottom: 30px;   /* Space at the bottom of the page */
+}
+
+/* Remove individual margins from the buttons so they don't clash with the gap */
+.fill-btn, .clear-btn {
+    margin: 0; 
+    white-space: nowrap; /* Prevents text from wrapping to two lines */
+}
+
     </style>
 </head>
 <body>
@@ -143,14 +174,16 @@ a {
     <h1>Codenames Board</h1>
     <a href="./randomizer.html" style="text-align: center;">Go to Color Randomizer →</a>
     <div style="margin: 10px;">
-    <button id="modeToggle" onclick="toggleMode()" style="padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; background-color: #2196F3; color: white; border: none;">
-        Mode: Edit Text
-    </button>
+    <button id="modeToggle" onclick="toggleMode()" style="padding: 10px 20px; border-radius: 8px; cursor: pointer; background-color: #2196F3; color: white; border: none; font-weight: 900;" >Mode: Edit Text</button>
 </div>
     
     <div class="container" id="board">
         </div>
 
+<div class="button-controls">
+    <button onclick="fillRandomWords()" class="fill-btn">Fill Words</button>
+    <button onclick="clearBoard()" class="clear-btn">Clear Board</button>
+</div>
     <script>
         const board = document.getElementById('board');
 
@@ -280,7 +313,70 @@ function toggleMode() {
         document.querySelectorAll('.item').forEach(el => el.classList.remove('active'));
     }
 }
+
+function fillRandomWords() {
+    // 1. A list of potential words (Add as many as you like!)
+const dictionary = [
+    "AALTO", "AARE", "AAVIKKO", "AIKA", "AIRUT", "AISA", "AITIO", "AIVO", "ALKU", "ALUS",
+    "ANKKURI", "ANSA", "ANTEEKSI", "APINA", "APTEEKKI", "ARKKU", "ARPA", "ASEMA", "ASKELE", "ASU",
+    "AURA", "AURINKO", "AUTO", "AVAIN", "AVOIN", "DRYADI", "EGG", "ELOKUVA", "ELÄIN", "EMÄS",
+    "ENKELI", "ERÄMAA", "ESPOO", "ESTE", "ETELÄ", "ETANA", "EUROOPPA", "HAAMU", "HAARUKKA", "HAAVI",
+    "HAAVU", "HAKKI", "HALTIJA", "HAMMAS", "HAMPURI", "HANSKA", "HANHI", "HARJA", "HARKKU", "HATTU",
+    "HAUHAU", "HAUKI", "HAUTA", "HEINÄ", "HEITTO", "HELMI", "HELSINKI", "HENKI", "HERNE", "HEVONEN",
+    "HIILI", "HIIRI", "HILJAISUUS", "HINAAJA", "HIRVI", "HOPEA", "HOTELLI", "HOUSU", "HUIJARI", "HUIILU",
+    "HULINAA", "HULLU", "HULPA", "HUMMA", "HUONE", "HUULI", "HYLLY", "HYPPY", "HÄKKI", "HÄNTÄ",
+    "HÄRKÄ", "HÄÄT", "IHO", "IKKUNA", "ILMA", "ILMAPALLO", "ILTA", "INTIA", "IRAK", "ISLANTI",
+    "ISKU", "ISTUIN", "ITÄ", "JALKA", "JALOKIVI", "JALUSTA", "JOHTO", "JOKI", "JOKERI", "JOULU",
+    "JOUSI", "JUNA", "JUURI", "JUUSTO", "JÄLKI", "JÄNNE", "JÄNIS", "JÄRJESTELMÄ", "JÄRVI", "JÄÄ",
+    "JÄÄTELÖ", "KAAPPI", "KAARI", "KAATU", "KAHVI", "KAIKU", "KAIVO", "KAKKU", "KALA", "KALLIO",
+    "KAMERUN", "KAMPPA", "KANAVA", "KANGAS", "KANI", "KANSA", "KANSI", "KANTA", "KAPPELI", "KARHU",
+    "KARTTA", "KASVI", "KATU", "KATTO", "KAULA", "KAUPPA", "KAVIO", "KEIJU", "KELLO", "KENKÄ",
+    "KEPPI", "KERROS", "KESÄ", "KETJU", "KIERRE", "KIINA", "KILPI", "KINKKU", "KIPINÄ", "KIRJA",
+    "KIRKKO", "KIRVES", "KIVI", "KOKKI", "KOLIKKO", "KONE", "KORPPI", "KORVA", "KOSKI", "KOTI",
+    "KOTKA", "KOULU", "KRUUNU", "KUKKA", "KUKKO", "KULTA", "KUMMIPOKA", "KUMI", "KUNINGAS", "KUNTA",
+    "KUORI", "KUPPI", "KURKKU", "KUTSU", "KUU", "KUUNARI", "KUUSI", "KYLMÄ", "KYLÄ", "KYMMENEN",
+    "KYNÄ", "KYNSI", "KYTKIN", "KÄRRY", "KÄSI", "KÄSINE", "KÖYSI", "LAATIKKO", "LAHJA", "LAHTI",
+    "LAIVA", "LAKANA", "LAKI", "LAMMAS", "LAMPI", "LAMPPU", "LANNE", "LAPIO", "LAPSI", "LASI",
+    "LAULU", "LAVUAARI", "LEHTI", "LEIPÄ", "LEMA", "LEMPPI", "LENKKI", "LENSKI", "LENTOKONE", "LEVY",
+    "LIEKKI", "LIIMA", "LINNA", "LINTU", "LIPPU", "LUKKO", "LUMI", "LUSIKKA", "LUU", "LUOLA",
+    "LYIJY", "LÄNSI", "MAA", "MAALI", "MAITO", "MAKKARA", "MANNER", "MANSIKKA", "MARJA", "MATTO",
+    "MEHU", "MELOON", "MERI", "METSÄ", "MIEKKA", "MIELI", "MIKROFONI", "MITTA", "MUNA", "MUSTA",
+    "MUUMI", "MYRSKY", "MYRKKY", "MÄKI", "NAHKAA", "NAINEN", "NUKKE", "NAULA", "NAURIS", "NENÄ",
+    "NEULA", "NIVEL", "NOITA", "NORJA", "NOUSU", "NURKKI", "NYRKKI", "OIKEE", "OMPPU", "OPETTAJA",
+    "OSTAJA", "OTSIKKO", "OVI", "PAASI", "PAIDAN", "PAIKKA", "PALATSI", "PALO", "PALLO", "PANKKI",
+    "PANTHERI", "PAPERI", "PARIISI", "PARTA", "PELI", "PELTO", "PENKKI", "PENSAS", "PERUNA", "PESÄ",
+    "PIIPPU", "PILVI", "PINTA", "PISTE", "POHJOINEN", "POLVI", "PORA", "PORTTI", "POSTI", "POUTA",
+    "PUHELIN", "PUIJARI", "PUISTO", "PULKKA", "PUMPPU", "PUNAINEN", "PURJE", "PUU", "PUUTARHA", "PYÖRÄ",
+    "PÄIVÄ", "PÄHKINÄ", "PÖYTÄ", "RAJA", "RAKKAUS", "RANNA", "RANNIKKO", "RANTA", "RAPU", "RASIA",
+    "RAUTA", "RENGAS", "REPU", "RIISI", "RISTI", "ROBOTTI", "ROMU", "RUOHO", "RUOTSI", "RUUMIS",
+    "RUUSU", "RYHMÄ", "SAARI", "SAIPPUA", "SAIRAALA", "SAKSET", "SALAMA", "SANKARI", "SAPELI", "SATEENKAARI",
+    "SATULAT", "SAUNA", "SEINÄ", "SEULA", "SIENI", "SIIPI", "SIKA", "SILMÄ", "SILTA", "SININEN",
+    "SISU", "SOLMU", "SORMUS", "SUOMI", "SUU", "SYDÄN", "TAIKURI", "TAIVAS", "TALO", "TALVI",
+    "TAMMI", "TANSSI", "TAPPA", "TARINA", "TASKU", "TEATTERI", "TEE", "TIMANTTI", "TIILI", "TIETOKONE",
+    "TIKERI", "TORI", "TULI", "TUNTURI", "TUOLI", "TORVI", "TYYNY", "TÄHTI", "TÄYSIN", "UHRI",
+    "UINTI", "UKKONEN", "ULOS", "UNI", "UNICORN", "UUNI", "VAATTEET", "VALAS", "VALO", "VANKILA",
+    "VAPPU", "VARJO", "VASARA", "VATSA", "VEITSI", "VENÄJÄ", "VERI", "VERKKO", "VESI", "VIHREÄ",
+    "VIINI", "VIULU", "VOITTO", "VUORI", "VYÖ", "YÖ", "ÄMPÄRI", "ÖLJY"
+];
+
+    // 2. Find all your input boxes
+    const inputs = document.querySelectorAll('.item input');
+
+    // 3. Shuffle the dictionary so you don't get the same words in the same order
+    const shuffled = dictionary.sort(() => 0.5 - Math.random());
+
+    // 4. Fill each box with a unique word from the shuffled list
+    inputs.forEach((input, index) => {
+        if (shuffled[index]) {
+            input.value = shuffled[index];
+        }
+    });
+
+    // 5. CRITICAL: Save these new words to LocalStorage immediately
+    saveWords();
+    
+    alert("Board filled with random words!");
+}
     </script>
-        <button onclick="clearBoard()" class="clear-btn">Clear All Words</button>
 </body>
 </html>
