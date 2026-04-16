@@ -125,11 +125,21 @@ p,a {
     <script>
         const board = document.getElementById('board');
 
+// Load the full data object (or 25 empty ones if it's the first time)
+const savedData = JSON.parse(localStorage.getItem('codenames_data')) || Array(25).fill({word: '', color: 'white', textColor: 'black'});
+
 // 1. Function to save all current words to LocalStorage
 function saveWords() {
-    const inputs = document.querySelectorAll('.item input');
-    const wordsArray = Array.from(inputs).map(input => input.value);
-    localStorage.setItem('codenames_words', JSON.stringify(wordsArray));
+    const items = document.querySelectorAll('.item');
+    const dataArray = Array.from(items).map(item => {
+        const input = item.querySelector('input');
+        return {
+            word: input.value,
+            color: item.style.backgroundColor || 'white', // Grabs current color
+            textColor: input.style.color || 'black'
+        };
+    });
+    localStorage.setItem('codenames_data', JSON.stringify(dataArray));
 }
 
 // 2. Load words from memory
@@ -139,26 +149,25 @@ for (let i = 0; i < 25; i++) {
     const item = document.createElement('div');
     item.className = 'item';
     
+    // LOAD: Set the box color from memory
+    item.style.backgroundColor = savedData[i].color || 'white';
+    
     const input = document.createElement('input');
     input.type = 'text';
     input.placeholder = 'WORD';
-    input.value = savedWords[i]; // Put the saved word back in the box
-
-    // SAVE every time someone stops typing
-    input.oninput = () => saveWords(); 
     
+    // LOAD: Set the word and text color from memory
+    input.value = savedData[i].word || '';
+    input.style.color = savedData[i].textColor || 'black';
+
+    // SAVE: When typing
+    input.oninput = () => saveWords(); 
     input.onclick = (e) => e.stopPropagation();
 
-    // ... (Keep the rest of your color menu code here) ...
-    // Make sure to add the color menu logic back inside this loop!
-    
-    item.appendChild(input);
-    board.appendChild(item);
-    // 1. Create the Menu Container
+    // COLOR MENU LOGIC
     const menu = document.createElement('div');
     menu.className = 'color-menu';
 
-    // 2. Define the buttons
     const colors = [
         { name: 'red', hex: '#f44336' },
         { name: 'blue', hex: '#2196F3' },
@@ -167,7 +176,6 @@ for (let i = 0; i < 25; i++) {
         { name: 'reset', hex: '#fff' }
     ];
 
-    // 3. Build the buttons
     colors.forEach(c => {
         const btn = document.createElement('div');
         btn.className = `btn btn-${c.name}`;
@@ -178,36 +186,42 @@ for (let i = 0; i < 25; i++) {
             item.style.backgroundColor = c.hex;
             input.style.color = (c.name === 'black') ? 'white' : 'black';
             item.classList.remove('active');
+            
+            // SAVE: Immediately after picking a color
+            saveWords(); 
         };
         menu.appendChild(btn);
     });
 
-    // 4. Logic to open the menu
     item.onclick = () => {
         document.querySelectorAll('.item').forEach(el => el.classList.remove('active'));
         item.classList.add('active');
     };
 
+    item.appendChild(input);
     item.appendChild(menu);
+    board.appendChild(item);
 }
 
 function clearBoard() {
-    if (confirm("Are you sure you want to erase all words?")) {
-        // 1. Find all the editable word boxes
-        const displays = document.querySelectorAll('.item input');
+    if (confirm("Are you sure you want to erase all words and colors?")) {
+        const items = document.querySelectorAll('.item');
         
-        // 2. Loop through them and make them empty
-        displays.forEach(input => {
+        items.forEach(item => {
+            const input = item.querySelector('input');
+            
+            // 1. Reset the text
             input.value = "";
-        });
-
-        // 3. Update the memory so they stay empty on refresh
-        saveWords();
-        
-        // Optional: Reset all colors back to white too
-        document.querySelectorAll('.item').forEach(item => {
+            input.style.color = "black";
+            
+            // 2. Reset the background
             item.style.backgroundColor = "white";
         });
+
+        // 3. CRITICAL: Save this 'Blank' state to memory immediately
+        saveWords(); 
+        
+        alert("Board Reset!");
     }
 }
     </script>
