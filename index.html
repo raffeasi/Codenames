@@ -89,7 +89,7 @@
         .btn-reset { background: #fff; line-height: 25px; text-align: center; font-size: 12px; }
 
 .clear-btn {
-    margin: 10px;
+    margin: 20px;
     background-color: #ff4d4d;
     color: white;
     font-weight: bold;
@@ -104,7 +104,7 @@
     background-color: #cc0000;
 }
 
-p,a {
+a {
     color: #222;
     font-weight: 1000;
     text-decoration: none;
@@ -116,8 +116,11 @@ p,a {
 
     <h1>Codenames Board</h1>
     <a href="./randomizer.html" style="text-align: center;">Go to Color Randomizer →</a>
-    <button onclick="clearBoard()" class="clear-btn">Clear All Words</button>
-    <p>Click a box to set its color.</p>
+    <div style="margin: 10px;">
+    <button id="modeToggle" onclick="toggleMode()" style="padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; background-color: #2196F3; color: white; border: none;">
+        Mode: Edit Text
+    </button>
+</div>
     
     <div class="container" id="board">
         </div>
@@ -193,10 +196,15 @@ for (let i = 0; i < 25; i++) {
         menu.appendChild(btn);
     });
 
-    item.onclick = () => {
+item.onclick = () => {
+    if (isColorMode) {
+        // 1. Close any menus that are already open
         document.querySelectorAll('.item').forEach(el => el.classList.remove('active'));
+        
+        // 2. Open the menu for the box we just clicked
         item.classList.add('active');
-    };
+    }
+}; // This closes the item.onclick function
 
     item.appendChild(input);
     item.appendChild(menu);
@@ -224,6 +232,29 @@ function clearBoard() {
         alert("Board Reset!");
     }
 }
+
+let isColorMode = false;
+
+function toggleMode() {
+    isColorMode = !isColorMode;
+    const btn = document.getElementById('modeToggle');
+    const inputs = document.querySelectorAll('.item input');
+
+    if (isColorMode) {
+        btn.innerText = "Mode: Change Colors";
+        btn.style.backgroundColor = "#4CAF50"; // Green for color mode
+        // Disable inputs so they don't block the box click
+        inputs.forEach(input => input.style.pointerEvents = 'none');
+    } else {
+        btn.innerText = "Mode: Edit Text";
+        btn.style.backgroundColor = "#2196F3"; // Blue for text mode
+        // Re-enable inputs
+        inputs.forEach(input => input.style.pointerEvents = 'auto');
+        // Close any open menus
+        document.querySelectorAll('.item').forEach(el => el.classList.remove('active'));
+    }
+}
     </script>
+        <button onclick="clearBoard()" class="clear-btn">Clear All Words</button>
 </body>
 </html>
