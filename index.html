@@ -188,23 +188,6 @@ a {
 // Load the full data object (or 25 empty ones if it's the first time)
 const savedData = JSON.parse(localStorage.getItem('codenames_data')) || Array(25).fill({word: '', color: 'white', textColor: 'black'});
 
-// 1. Function to save all current words to LocalStorage
-function saveWords() {
-    const items = document.querySelectorAll('.item');
-    const dataArray = Array.from(items).map(item => {
-        const input = item.querySelector('input');
-        return {
-            word: input.value,
-            color: item.style.backgroundColor || 'white', // Grabs current color
-            textColor: input.style.color || 'black'
-        };
-    });
-    localStorage.setItem('codenames_data', JSON.stringify(dataArray));
-}
-
-// 2. Load words from memory
-const savedWords = JSON.parse(localStorage.getItem('codenames_words')) || Array(25).fill('');
-
 for (let i = 0; i < 25; i++) {
     const item = document.createElement('div');
     item.className = 'item';
@@ -222,6 +205,7 @@ for (let i = 0; i < 25; i++) {
 
     // SAVE: When typing
     input.oninput = () => saveWords(); 
+    adjustAllFontSizes();
     input.onclick = (e) => e.stopPropagation();
 
     // COLOR MENU LOGIC
@@ -252,6 +236,20 @@ for (let i = 0; i < 25; i++) {
         };
         menu.appendChild(btn);
     });
+
+    function adjustAllFontSizes() {
+    const inputs = document.querySelectorAll('.item input');
+    inputs.forEach(input => {
+        const length = input.value.length;
+        if (length > 12) {
+            input.style.fontSize = "11px";
+        } else if (length > 8) {
+            input.style.fontSize = "14px";
+        } else {
+            input.style.fontSize = "18px";
+        }
+    });
+}
 
 item.onclick = () => {
     if (isColorMode) {
@@ -380,9 +378,26 @@ inputs.forEach((input, index) => {
 
     // 5. CRITICAL: Save these new words to LocalStorage immediately
     saveWords();
-    
+    adjustAllFontSizes();
     alert("Board filled with random words!");
 }
+
+// 1. Function to save all current words to LocalStorage
+function saveWords() {
+    const items = document.querySelectorAll('.item');
+    const dataArray = Array.from(items).map(item => {
+        const input = item.querySelector('input');
+        return {
+            word: input.value,
+            color: item.style.backgroundColor || 'white', // Grabs current color
+            textColor: input.style.color || 'black'
+        };
+    });
+    localStorage.setItem('codenames_data', JSON.stringify(dataArray));
+}
+
+// 2. Load words from memory
+const savedWords = JSON.parse(localStorage.getItem('codenames_words')) || Array(25).fill('');
     </script>
 </body>
 </html>
