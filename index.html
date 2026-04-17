@@ -182,30 +182,45 @@ a {
     <button onclick="fillRandomWords()" class="fill-btn">Fill Words</button>
     <button onclick="clearBoard()" class="clear-btn">Clear Board</button>
 </div>
-    <script>
-        const board = document.getElementById('board');
+<script>
+const board = document.getElementById('board');
 
-// Load the full data object (or 25 empty ones if it's the first time)
+// 1. Move the helper function to the TOP so the loop can see it
+function adjustAllFontSizes() {
+    const inputs = document.querySelectorAll('.item input');
+    inputs.forEach(input => {
+        const length = input.value.length;
+        if (length > 12) {
+            input.style.fontSize = "11px";
+        } else if (length > 8) {
+            input.style.fontSize = "13px";
+        } else {
+            input.style.fontSize = "18px";
+        }
+    });
+}
+
+// 2. Load the data
 const savedData = JSON.parse(localStorage.getItem('codenames_data')) || Array(25).fill({word: '', color: 'white', textColor: 'black'});
 
+// 3. Create the Board
 for (let i = 0; i < 25; i++) {
     const item = document.createElement('div');
     item.className = 'item';
-    
-    // LOAD: Set the box color from memory
     item.style.backgroundColor = savedData[i].color || 'white';
     
     const input = document.createElement('input');
     input.type = 'text';
     input.placeholder = 'WORD';
-    
-    // LOAD: Set the word and text color from memory
     input.value = savedData[i].word || '';
     input.style.color = savedData[i].textColor || 'black';
 
-    // SAVE: When typing
-    input.oninput = () => saveWords(); 
-    adjustAllFontSizes();
+    // FIX: Put both commands inside the function brackets
+    input.oninput = () => {
+        saveWords();
+        adjustAllFontSizes();
+    }; 
+    
     input.onclick = (e) => e.stopPropagation();
 
     // COLOR MENU LOGIC
@@ -230,66 +245,25 @@ for (let i = 0; i < 25; i++) {
             item.style.backgroundColor = c.hex;
             input.style.color = (c.name === 'black') ? 'white' : 'black';
             item.classList.remove('active');
-            
-            // SAVE: Immediately after picking a color
             saveWords(); 
         };
         menu.appendChild(btn);
     });
 
-    function adjustAllFontSizes() {
-    const inputs = document.querySelectorAll('.item input');
-    inputs.forEach(input => {
-        const length = input.value.length;
-        if (length > 12) {
-            input.style.fontSize = "11px";
-        } else if (length > 8) {
-            input.style.fontSize = "14px";
-        } else {
-            input.style.fontSize = "18px";
+    item.onclick = () => {
+        if (isColorMode) {
+            document.querySelectorAll('.item').forEach(el => el.classList.remove('active'));
+            item.classList.add('active');
         }
-    });
-}
-
-item.onclick = () => {
-    if (isColorMode) {
-        // 1. Close any menus that are already open
-        document.querySelectorAll('.item').forEach(el => el.classList.remove('active'));
-        
-        // 2. Open the menu for the box we just clicked
-        item.classList.add('active');
-    }
-}; // This closes the item.onclick function
+    };
 
     item.appendChild(input);
     item.appendChild(menu);
     board.appendChild(item);
 }
 
-function clearBoard() {
-    if (confirm("Are you sure you want to erase all words and colors?")) {
-        const items = document.querySelectorAll('.item');
-        
-        items.forEach(item => {
-            const input = item.querySelector('input');
-            
-            // 1. Reset the text
-            input.value = "";
-            input.style.color = "black";
-            
-            // 2. Reset the background
-            item.style.backgroundColor = "white";
-        });
-
-        // 3. CRITICAL: Save this 'Blank' state to memory immediately
-        saveWords(); 
-        
-        alert("Board Reset!");
-    }
-}
-
+// 4. Mode Toggle Logic
 let isColorMode = false;
-
 function toggleMode() {
     isColorMode = !isColorMode;
     const btn = document.getElementById('modeToggle');
@@ -297,107 +271,59 @@ function toggleMode() {
 
     if (isColorMode) {
         btn.innerText = "Mode: Change Colors";
-        btn.style.backgroundColor = "#4CAF50"; // Green for color mode
-        // Disable inputs so they don't block the box click
+        btn.style.backgroundColor = "#4CAF50";
         inputs.forEach(input => input.style.pointerEvents = 'none');
     } else {
         btn.innerText = "Mode: Edit Text";
-        btn.style.backgroundColor = "#2196F3"; // Blue for text mode
-        // Re-enable inputs
+        btn.style.backgroundColor = "#2196F3";
         inputs.forEach(input => input.style.pointerEvents = 'auto');
-        // Close any open menus
         document.querySelectorAll('.item').forEach(el => el.classList.remove('active'));
     }
 }
 
+// 5. Fill and Clear Functions
 function fillRandomWords() {
-    // 1. A list of potential words (Add as many as you like!)
-const dictionary = [
-    "AALTO", "AARE", "AAVIKKO", "AIKA", "AIRUT", "AISA", "AITIO", "AIVO", "ALKU", "ALUS",
-    "ANKKURI", "ANSA", "ANTEEKSI", "APINA", "APTEEKKI", "ARKKU", "ARPA", "ASEMA", "ASKELE", "ASU",
-    "AURA", "AURINKO", "AUTO", "AVAIN", "AVOIN", "DRYADI", "EGG", "ELOKUVA", "ELÄIN", "EMÄS",
-    "ENKELI", "ERÄMAA", "ESPOO", "ESTE", "ETELÄ", "ETANA", "EUROOPPA", "HAAMU", "HAARUKKA", "HAAVI",
-    "HAAVU", "HAKKI", "HALTIJA", "HAMMAS", "HAMPURI", "HANSKA", "HANHI", "HARJA", "HARKKU", "HATTU",
-    "HAUHAU", "HAUKI", "HAUTA", "HEINÄ", "HEITTO", "HELMI", "HELSINKI", "HENKI", "HERNE", "HEVONEN",
-    "HIILI", "HIIRI", "HILJAISUUS", "HINAAJA", "HIRVI", "HOPEA", "HOTELLI", "HOUSU", "HUIJARI", "HUIILU",
-    "HULINAA", "HULLU", "HULPA", "HUMMA", "HUONE", "HUULI", "HYLLY", "HYPPY", "HÄKKI", "HÄNTÄ",
-    "HÄRKÄ", "HÄÄT", "IHO", "IKKUNA", "ILMA", "ILMAPALLO", "ILTA", "INTIA", "IRAK", "ISLANTI",
-    "ISKU", "ISTUIN", "ITÄ", "JALKA", "JALOKIVI", "JALUSTA", "JOHTO", "JOKI", "JOKERI", "JOULU",
-    "JOUSI", "JUNA", "JUURI", "JUUSTO", "JÄLKI", "JÄNNE", "JÄNIS", "JÄRJESTELMÄ", "JÄRVI", "JÄÄ",
-    "JÄÄTELÖ", "KAAPPI", "KAARI", "KAATU", "KAHVI", "KAIKU", "KAIVO", "KAKKU", "KALA", "KALLIO",
-    "KAMERUN", "KAMPPA", "KANAVA", "KANGAS", "KANI", "KANSA", "KANSI", "KANTA", "KAPPELI", "KARHU",
-    "KARTTA", "KASVI", "KATU", "KATTO", "KAULA", "KAUPPA", "KAVIO", "KEIJU", "KELLO", "KENKÄ",
-    "KEPPI", "KERROS", "KESÄ", "KETJU", "KIERRE", "KIINA", "KILPI", "KINKKU", "KIPINÄ", "KIRJA",
-    "KIRKKO", "KIRVES", "KIVI", "KOKKI", "KOLIKKO", "KONE", "KORPPI", "KORVA", "KOSKI", "KOTI",
-    "KOTKA", "KOULU", "KRUUNU", "KUKKA", "KUKKO", "KULTA", "KUMMIPOKA", "KUMI", "KUNINGAS", "KUNTA",
-    "KUORI", "KUPPI", "KURKKU", "KUTSU", "KUU", "KUUNARI", "KUUSI", "KYLMÄ", "KYLÄ", "KYMMENEN",
-    "KYNÄ", "KYNSI", "KYTKIN", "KÄRRY", "KÄSI", "KÄSINE", "KÖYSI", "LAATIKKO", "LAHJA", "LAHTI",
-    "LAIVA", "LAKANA", "LAKI", "LAMMAS", "LAMPI", "LAMPPU", "LANNE", "LAPIO", "LAPSI", "LASI",
-    "LAULU", "LAVUAARI", "LEHTI", "LEIPÄ", "LEMA", "LEMPPI", "LENKKI", "LENSKI", "LENTOKONE", "LEVY",
-    "LIEKKI", "LIIMA", "LINNA", "LINTU", "LIPPU", "LUKKO", "LUMI", "LUSIKKA", "LUU", "LUOLA",
-    "LYIJY", "LÄNSI", "MAA", "MAALI", "MAITO", "MAKKARA", "MANNER", "MANSIKKA", "MARJA", "MATTO",
-    "MEHU", "MELOON", "MERI", "METSÄ", "MIEKKA", "MIELI", "MIKROFONI", "MITTA", "MUNA", "MUSTA",
-    "MUUMI", "MYRSKY", "MYRKKY", "MÄKI", "NAHKAA", "NAINEN", "NUKKE", "NAULA", "NAURIS", "NENÄ",
-    "NEULA", "NIVEL", "NOITA", "NORJA", "NOUSU", "NURKKI", "NYRKKI", "OIKEE", "OMPPU", "OPETTAJA",
-    "OSTAJA", "OTSIKKO", "OVI", "PAASI", "PAIDAN", "PAIKKA", "PALATSI", "PALO", "PALLO", "PANKKI",
-    "PANTHERI", "PAPERI", "PARIISI", "PARTA", "PELI", "PELTO", "PENKKI", "PENSAS", "PERUNA", "PESÄ",
-    "PIIPPU", "PILVI", "PINTA", "PISTE", "POHJOINEN", "POLVI", "PORA", "PORTTI", "POSTI", "POUTA",
-    "PUHELIN", "PUIJARI", "PUISTO", "PULKKA", "PUMPPU", "PUNAINEN", "PURJE", "PUU", "PUUTARHA", "PYÖRÄ",
-    "PÄIVÄ", "PÄHKINÄ", "PÖYTÄ", "RAJA", "RAKKAUS", "RANNA", "RANNIKKO", "RANTA", "RAPU", "RASIA",
-    "RAUTA", "RENGAS", "REPU", "RIISI", "RISTI", "ROBOTTI", "ROMU", "RUOHO", "RUOTSI", "RUUMIS",
-    "RUUSU", "RYHMÄ", "SAARI", "SAIPPUA", "SAIRAALA", "SAKSET", "SALAMA", "SANKARI", "SAPELI", "SATEENKAARI",
-    "SATULAT", "SAUNA", "SEINÄ", "SEULA", "SIENI", "SIIPI", "SIKA", "SILMÄ", "SILTA", "SININEN",
-    "SISU", "SOLMU", "SORMUS", "SUOMI", "SUU", "SYDÄN", "TAIKURI", "TAIVAS", "TALO", "TALVI",
-    "TAMMI", "TANSSI", "TAPPA", "TARINA", "TASKU", "TEATTERI", "TEE", "TIMANTTI", "TIILI", "TIETOKONE",
-    "TIKERI", "TORI", "TULI", "TUNTURI", "TUOLI", "TORVI", "TYYNY", "TÄHTI", "TÄYSIN", "UHRI",
-    "UINTI", "UKKONEN", "ULOS", "UNI", "UNICORN", "UUNI", "VAATTEET", "VALAS", "VALO", "VANKILA",
-    "VAPPU", "VARJO", "VASARA", "VATSA", "VEITSI", "VENÄJÄ", "VERI", "VERKKO", "VESI", "VIHREÄ",
-    "VIINI", "VIULU", "VOITTO", "VUORI", "VYÖ", "YÖ", "ÄMPÄRI", "ÖLJY"
-];
-
-    // 2. Find all your input boxes
+    const dictionary = ["AALTO", "AARE", "AAVIKKO", "AIKA", "AIRUT", "AISA", "AITIO", "AIVO", "ALKU", "ALUS", "ANKKURI", "ANSA", "ANTEEKSI", "APINA", "APTEEKKI", "ARKKU", "ARPA", "ASEMA", "ASKELE", "ASU", "AURA", "AURINKO", "AUTO", "AVAIN", "AVOIN", "DRYADI", "EGG", "ELOKUVA", "ELÄIN", "EMÄS", "ENKELI", "ERÄMAA", "ESPOO", "ESTE", "ETELÄ", "ETANA", "EUROOPPA", "HAAMU", "HAARUKKA", "HAAVI", "HAAVU", "HAKKI", "HALTIJA", "HAMMAS", "HAMPURI", "HANSKA", "HANHI", "HARJA", "HARKKU", "HATTU", "HAUHAU", "HAUKI", "HAUTA", "HEINÄ", "HEITTO", "HELMI", "HELSINKI", "HENKI", "HERNE", "HEVONEN", "HIILI", "HIIRI", "HILJAISUUS", "HINAAJA", "HIRVI", "HOPEA", "HOTELLI", "HOUSU", "HUIJARI", "HUIILU", "HULINAA", "HULLU", "HULPA", "HUMMA", "HUONE", "HUULI", "HYLLY", "HYPPY", "HÄKKI", "HÄNTÄ", "HÄRKÄ", "HÄÄT", "IHO", "IKKUNA", "ILMA", "ILMAPALLO", "ILTA", "INTIA", "IRAK", "ISLANTI", "ISKU", "ISTUIN", "ITÄ", "JALKA", "JALOKIVI", "JALUSTA", "JOHTO", "JOKI", "JOKERI", "JOULU", "JOUSI", "JUNA", "JUURI", "JUUSTO", "JÄLKI", "JÄNNE", "JÄNIS", "JÄRJESTELMÄ", "JÄRVI", "JÄÄ", "JÄÄTELÖ", "KAAPPI", "KAARI", "KAATU", "KAHVI", "KAIKU", "KAIVO", "KAKKU", "KALA", "KALLIO", "KAMERUN", "KAMPPA", "KANAVA", "KANGAS", "KANI", "KANSA", "KANSI", "KANTA", "KAPPELI", "KARHU", "KARTTA", "KASVI", "KATU", "KATTO", "KAULA", "KAUPPA", "KAVIO", "KEIJU", "KELLO", "KENKÄ", "KEPPI", "KERROS", "KESÄ", "KETJU", "KIERRE", "KIINA", "KILPI", "KINKKU", "KIPINÄ", "KIRJA", "KIRKKO", "KIRVES", "KIVI", "KOKKI", "KOLIKKO", "KONE", "KORPPI", "KORVA", "KOSKI", "KOTI", "KOTKA", "KOULU", "KRUUNU", "KUKKA", "KUKKO", "KULTA", "KUMMIPOKA", "KUMI", "KUNINGAS", "KUNTA", "KUORI", "KUPPI", "KURKKU", "KUTSU", "KUU", "KUUNARI", "KUUSI", "KYLMÄ", "KYLÄ", "KYMMENEN", "KYNÄ", "KYNSI", "KYTKIN", "KÄRRY", "KÄSI", "KÄSINE", "KÖYSI", "LAATIKKO", "LAHJA", "LAHTI", "LAIVA", "LAKANA", "LAKI", "LAMMAS", "LAMPI", "LAMPPU", "LANNE", "LAPIO", "LAPSI", "LASI", "LAULU", "LAVUAARI", "LEHTI", "LEIPÄ", "LEMA", "LEMPPI", "LENKKI", "LENSKI", "LENTOKONE", "LEVY", "LIEKKI", "LIIMA", "LINNA", "LINTU", "LIPPU", "LUKKO", "LUMI", "LUSIKKA", "LUU", "LUOLA", "LYIJY", "LÄNSI", "MAA", "MAALI", "MAITO", "MAKKARA", "MANNER", "MANSIKKA", "MARJA", "MATTO", "MEHU", "MELOON", "MERI", "METSÄ", "MIEKKA", "MIELI", "MIKROFONI", "MITTA", "MUNA", "MUSTA", "MUUMI", "MYRSKY", "MYRKKY", "MÄKI", "NAHKAA", "NAINEN", "NUKKE", "NAULA", "NAURIS", "NENÄ", "NEULA", "NIVEL", "NOITA", "NORJA", "NOUSU", "NURKKI", "NYRKKI", "OIKEE", "OMPPU", "OPETTAJA", "OSTAJA", "OTSIKKO", "OVI", "PAASI", "PAIDAN", "PAIKKA", "PALATSI", "PALO", "PALLO", "PANKKI", "PANTHERI", "PAPERI", "PARIISI", "PARTA", "PELI", "PELTO", "PENKKI", "PENSAS", "PERUNA", "PESÄ", "PIIPPU", "PILVI", "PINTA", "PISTE", "POHJOINEN", "POLVI", "PORA", "PORTTI", "POSTI", "POUTA", "PUHELIN", "PUIJARI", "PUISTO", "PULKKA", "PUMPPU", "PUNAINEN", "PURJE", "PUU", "PUUTARHA", "PYÖRÄ", "PÄIVÄ", "PÄHKINÄ", "PÖYTÄ", "RAJA", "RAKKAUS", "RANNA", "RANNIKKO", "RANTA", "RAPU", "RASIA", "RAUTA", "RENGAS", "REPU", "RIISI", "RISTI", "ROBOTTI", "ROMU", "RUOHO", "RUOTSI", "RUUMIS", "RUUSU", "RYHMÄ", "SAARI", "SAIPPUA", "SAIRAALA", "SAKSET", "SALAMA", "SANKARI", "SAPELI", "SATEENKAARI", "SATULAT", "SAUNA", "SEINÄ", "SEULA", "SIENI", "SIIPI", "SIKA", "SILMÄ", "SILTA", "SININEN", "SISU", "SOLMU", "SORMUS", "SUOMI", "SUU", "SYDÄN", "TAIKURI", "TAIVAS", "TALO", "TALVI", "TAMMI", "TANSSI", "TAPPA", "TARINA", "TASKU", "TEATTERI", "TEE", "TIMANTTI", "TIILI", "TIETOKONE", "TIKERI", "TORI", "TULI", "TUNTURI", "TUOLI", "TORVI", "TYYNY", "TÄHTI", "TÄYSIN", "UHRI", "UINTI", "UKKONEN", "ULOS", "UNI", "UNICORN", "UUNI", "VAATTEET", "VALAS", "VALO", "VANKILA", "VAPPU", "VARJO", "VASARA", "VATSA", "VEITSI", "VENÄJÄ", "VERI", "VERKKO", "VESI", "VIHREÄ", "VIINI", "VIULU", "VOITTO", "VUORI", "VYÖ", "YÖ", "ÄMPÄRI", "ÖLJY"];
     const inputs = document.querySelectorAll('.item input');
-
-    // 3. Shuffle the dictionary so you don't get the same words in the same order
     const shuffled = dictionary.sort(() => 0.5 - Math.random());
 
-    // 4. Fill each box with a unique word from the shuffled list
-inputs.forEach((input, index) => {
-    if (shuffled[index]) {
-        const word = shuffled[index];
-        input.value = word;
-
-        // If the word is long, make the font smaller
-        if (word.length > 9) {
-            input.style.fontSize = "12px";
-        } else {
-            input.style.fontSize = "18px";
+    inputs.forEach((input, index) => {
+        if (shuffled[index]) {
+            input.value = shuffled[index];
         }
-    }
-});
+    });
 
-    // 5. CRITICAL: Save these new words to LocalStorage immediately
     saveWords();
     adjustAllFontSizes();
-    alert("Board filled with random words!");
 }
 
-// 1. Function to save all current words to LocalStorage
+function clearBoard() {
+    if (confirm("Are you sure?")) {
+        document.querySelectorAll('.item').forEach(item => {
+            const input = item.querySelector('input');
+            input.value = "";
+            input.style.color = "black";
+            item.style.backgroundColor = "white";
+        });
+        saveWords();
+    }
+}
+
 function saveWords() {
     const items = document.querySelectorAll('.item');
     const dataArray = Array.from(items).map(item => {
         const input = item.querySelector('input');
         return {
             word: input.value,
-            color: item.style.backgroundColor || 'white', // Grabs current color
+            color: item.style.backgroundColor || 'white',
             textColor: input.style.color || 'black'
         };
     });
     localStorage.setItem('codenames_data', JSON.stringify(dataArray));
 }
 
-// 2. Load words from memory
-const savedWords = JSON.parse(localStorage.getItem('codenames_words')) || Array(25).fill('');
-    </script>
+// 6. Run on initial load to fix font sizes of saved words
+adjustAllFontSizes();
+</script>
 </body>
 </html>
